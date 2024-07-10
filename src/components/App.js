@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import Editor from './Editor'
-import useLocalStorage from '../hooks/useLocalStorage'
+import Editor from './Editor';
+import useLocalStorage from '../hooks/useLocalStorage';
 
 function App() {
-  const [html, setHtml] = useLocalStorage('html', '')
-  const [css, setCss] = useLocalStorage('css', '')
-  const [js, setJs] = useLocalStorage('js', '')
-  const [srcDoc, setSrcDoc] = useState('')
+  const [html, setHtml] = useLocalStorage('html', '');
+  const [css, setCss] = useLocalStorage('css', '');
+  const [js, setJs] = useLocalStorage('js', '');
+  const [srcDoc, setSrcDoc] = useState('');
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -16,11 +16,20 @@ function App() {
           <style>${css}</style>
           <script>${js}</script>
         </html>
-      `)
-    }, 250)
+      `);
+    }, 250);
 
-    return () => clearTimeout(timeout)
-  }, [html, css, js])
+    return () => clearTimeout(timeout);
+  }, [html, css, js]);
+
+  const downloadFile = (filename, content) => {
+    const element = document.createElement('a');
+    const file = new Blob([content], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = filename;
+    document.body.appendChild(element); // Required for this to work in FireFox
+    element.click();
+  };
 
   return (
     <>
@@ -54,8 +63,13 @@ function App() {
           height="100%"
         />
       </div>
+      <div className="download-buttons">
+        <button onClick={() => downloadFile('index.html', html)}>Download HTML</button>
+        <button onClick={() => downloadFile('styles.css', css)}>Download CSS</button>
+        <button onClick={() => downloadFile('script.js', js)}>Download JS</button>
+      </div>
     </>
-  )
+  );
 }
 
 export default App;
